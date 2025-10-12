@@ -1,0 +1,23 @@
+{
+  "name": "live-sync",
+  "version": "1.0.0",
+  "description": "This a desktop application where the changes made on the source file will be reflecting on the dstination file in a real time",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Niranjana593/Live-Sync.git"
+  },
+  "author": "Niranjan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Niranjana593/Live-Sync/issues"
+  },
+  "homepage": "https://github.com/Niranjana593/Live-Sync#readme",
+  "devDependencies": {
+    "electron": "^38.2.2"
+  }
+}
