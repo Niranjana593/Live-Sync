@@ -10,6 +10,13 @@ function App() {
     chrome: window.versions.chrome(),
     electron: window.versions.electron()
   })
+  const [message, setmessage] = useState("")
+  function sendDate(){
+      window.versions.loadData('Hello world from Niranjan').then((result)=>{
+        console.log(result);
+        setmessage(result);
+      })
+  }
   return (
     <>
       <h1>Hello World!, Welcome to my first Electron App</h1>
@@ -24,6 +31,8 @@ function App() {
           **Electron version:** {versions.electron}
         </li>
       </ul>
+      <button onClick={()=>sendDate()}>Click me to send the Message to the Main process</button>
+      <h1>Message from Main Process {message}</h1>
     </>
   )
 }
