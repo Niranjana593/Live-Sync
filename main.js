@@ -1,5 +1,9 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow ,ipcMain} = require('electron')
 const path = require('path')
+ipcMain.handle('data-change',async(event,message)=>{
+  console.log(message);
+  return 'Recieve your message'
+})
 const createWindow = () => {
   const win = new BrowserWindow({
     width: 800,
