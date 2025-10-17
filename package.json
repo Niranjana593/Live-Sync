@@ -19,5 +19,9 @@
   "homepage": "https://github.com/Niranjana593/Live-Sync#readme",
   "devDependencies": {
     "electron": "^38.2.2"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.14",
+    "tailwindcss": "^4.1.14"
   }
 }
