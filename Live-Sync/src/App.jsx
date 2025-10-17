@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import Dragdrop from './components/dragdrop.jsx'
 import './App.css'
 
 function App() {
@@ -19,20 +18,9 @@ function App() {
   }
   return (
     <>
-      <h1>Hello World!, Welcome to my first Electron App</h1>
-<ul>
-        <li>
-          **Chrome version:** {versions.chrome}
-        </li>
-        <li>
-          **Node version:** {versions.node}
-        </li>
-        <li>
-          **Electron version:** {versions.electron}
-        </li>
-      </ul>
-      <button onClick={()=>sendDate()}>Click me to send the Message to the Main process</button>
-      <h1>Message from Main Process {message}</h1>
+      <h1 className='flex justify-center items-center mb-10 text-3xl font-semibold pt-10'>Live File Sync</h1>
+       <Dragdrop/>
+      
     </>
   )
 }
