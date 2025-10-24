@@ -1,9 +1,9 @@
 const { contextBridge,ipcRenderer} = require('electron')
 
 contextBridge.exposeInMainWorld('versions', {
-  node: () => process.versions.node,
-  chrome: () => process.versions.chrome,
-  electron: () => process.versions.electron,
-  loadData:(message)=> ipcRenderer.invoke('data-change',message)
+  
+  loadData:(message)=> ipcRenderer.invoke('data-change',message),
+  selectSource: () => ipcRenderer.invoke('select-source'),
+  selectDestination: () => ipcRenderer.invoke('select-destination'),
   // we can also expose variables, not just functions
 })
