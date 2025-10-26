@@ -64,9 +64,12 @@ ipcMain.handle('Start-Sync',async (event)=>{
   watcher.on('change',path=>{
     console.log(`File ${path} has been changed`);
      const stream=fs.createReadStream(sourcefile,'utf-8');
+     const writable=fs.createWriteStream(destinationfile,'utf-8');
      stream.on('data',chunk=>{
         console.log('Detecting the Change....');
         // console.log(chunk);
+        writable.write(chunk);
+        console.log('File Synced Successfully');
      })
   })
 })
