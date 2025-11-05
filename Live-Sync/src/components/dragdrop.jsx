@@ -16,8 +16,15 @@ const Dragdrop = () => {
   };
   async function startSync(){
     let response=await window.versions.startSync();
-    alert(response);
+    console.log(response);
+    if(response==="permission denied"){
+        alert('Selected File does not have read/write permissions');
+    }
+    if(sourcefile===destinationfile){
+      alert('Source and Destination file cannot be same');
+    }
   }
+
   return (
     <>
       <div className='fileupload justify-center   flex w-100vw  gap-10'>
