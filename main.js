@@ -56,11 +56,23 @@ ipcMain.handle('select-destination', async (event) => {
   destinationfile=filePaths[0];
   return filePaths[0];  // return first selected path
 });
+function Checkpermissions(){
+   try{
+    fs.access('sourcefile',fs.constants.R_OK || fs.constants.W_OK)
+    return true;
+   }
+   catch{
+    return false;
+   }
+}
 ipcMain.handle('Start-Sync',async (event)=>{
   let watcher=chokidar.watch(sourcefile,{
     persistent:true,
     ignoreInitial:true
   })
+  if(!Checkpermissions){
+    return 'Permission denied';
+  }
   watcher.on('change',path=>{
     console.log(`File ${path} has been changed`);
      const stream=fs.createReadStream(sourcefile,'utf-8');
