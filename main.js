@@ -1,15 +1,12 @@
-const { app, BrowserWindow ,ipcMain,dialog} = require('electron')
+const { app, BrowserWindow ,ipcMain,dialog,webContents} = require('electron')
 const chokidar=require('chokidar');
 const fs=require('fs');
 const path = require('path')
-ipcMain.handle('data-change',async(event,message)=>{
-  console.log(message);
-  return 'Recieve your message'
-})
+let mainWindow;
 let sourcefile="";
 let destinationfile="";
 const createWindow = () => {
-  const win = new BrowserWindow({
+   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -19,7 +16,7 @@ const createWindow = () => {
     }
   })
 
-  win.loadURL('http://localhost:5173/')
+  mainWindow.loadURL('http://localhost:5173/')
 }
 
 app.whenReady().then(() => {
@@ -57,6 +54,7 @@ ipcMain.handle('select-destination', async (event) => {
   return filePaths[0];  // return first selected path
 });
 function Checkpermissions(){
+  //Checks for the permission of the file
    try{
     fs.access('sourcefile',fs.constants.R_OK || fs.constants.W_OK)
     return true;
@@ -75,14 +73,31 @@ ipcMain.handle('Start-Sync',async (event)=>{
   }
   watcher.on('change',path=>{
     console.log(`File ${path} has been changed`);
-     const stream=fs.createReadStream(sourcefile,'utf-8');
-     const writable=fs.createWriteStream(destinationfile,'utf-8');
-     stream.on('data',chunk=>{
-        console.log('Detecting the Change....');
-        // console.log(chunk);
+    
+    // Send initial detection message
+    mainWindow.webContents.send('Sync-Status', `Changes detected in source file: ${path}`);
+    try {
+      const stream = fs.createReadStream(sourcefile, 'utf-8');
+      const writable = fs.createWriteStream(destinationfile, 'utf-8');
+      
+      stream.on('data', chunk => {
+        console.log('Writing changes to destination file...');
         writable.write(chunk);
-        console.log('File Synced Successfully');
-     })
+      });
+
+      stream.on('end', () => {
+        console.log('File Sync Completed');
+        mainWindow.webContents.send('Sync-Status', 'File synchronization completed successfully');
+      });
+
+      stream.on('error', (error) => {
+        console.error('Error during sync:', error);
+        mainWindow.webContents.send('Sync-Status', `Error during sync: ${error.message}`);
+      });
+    } catch (error) {
+      console.error('Error setting up file sync:', error);
+      mainWindow.webContents.send('Sync-Status', `Failed to start sync: ${error.message}`);
+    }
   })
 })
 app.on('window-all-closed', () => {
