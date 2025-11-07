@@ -74,16 +74,30 @@ ipcMain.handle('Start-Sync',async (event)=>{
   watcher.on('change',path=>{
     console.log(`File ${path} has been changed`);
     
-    mainWindow.webContents.send('Sync-Status', 'Source file changes are detected,Syncing of file in progress....');
-    
-    const stream=fs.createReadStream(sourcefile,'utf-8');
-    const writable=fs.createWriteStream(destinationfile,'utf-8');
-    stream.on('data',chunk=>{
-      console.log('Detecting the Change....');
-      writable.write(chunk);
-      console.log('File Synced Successfully');
-      mainWindow.webContents.send('Sync-Status', 'Changes are successfully updated in the destination file');
-    });
+    // Send initial detection message
+    mainWindow.webContents.send('Sync-Status', `Changes detected in source file: ${path}`);
+    try {
+      const stream = fs.createReadStream(sourcefile, 'utf-8');
+      const writable = fs.createWriteStream(destinationfile, 'utf-8');
+      
+      stream.on('data', chunk => {
+        console.log('Writing changes to destination file...');
+        writable.write(chunk);
+      });
+
+      stream.on('end', () => {
+        console.log('File Sync Completed');
+        mainWindow.webContents.send('Sync-Status', 'File synchronization completed successfully');
+      });
+
+      stream.on('error', (error) => {
+        console.error('Error during sync:', error);
+        mainWindow.webContents.send('Sync-Status', `Error during sync: ${error.message}`);
+      });
+    } catch (error) {
+      console.error('Error setting up file sync:', error);
+      mainWindow.webContents.send('Sync-Status', `Failed to start sync: ${error.message}`);
+    }
   })
 })
 app.on('window-all-closed', () => {
