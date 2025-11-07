@@ -6,4 +6,6 @@ contextBridge.exposeInMainWorld('versions', {
   selectDestination: () => ipcRenderer.invoke('select-destination'),
   startSync: ()=>ipcRenderer.invoke('Start-Sync'),
   // we can also expose variables, not just functions
-})
+  onSyncStatus: (callback) =>
+    ipcRenderer.on('Sync-Status', (event,message) => callback(message)),
+});
