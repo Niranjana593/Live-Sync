@@ -1,9 +1,20 @@
 import React, { useState } from 'react'
+import { useEffect } from 'react';
 import { FileUploader } from "react-drag-drop-files";
 const Dragdrop = () => {
-  const [files, setFiles] = useState([])
   const [sourcefile, setsourcefile] = useState("");
   const [destinationfile, setdestinationfile] = useState("");
+  const [logs, setlogs] = useState([]);
+  useEffect(() => {
+    window.versions.onSyncStatus((message) => {
+      setlogs((prevLogs) => [...prevLogs, message]);
+    });
+  }, []);
+
+  useEffect(() => {
+    console.log(logs);
+  }, [logs])
+  
   async function selectSource() {
     const path = await window.versions.selectSource();
     if (path) setsourcefile(path);
@@ -15,13 +26,19 @@ const Dragdrop = () => {
     else setdestinationfile('No file selected');
   };
   async function startSync(){
-    let response=await window.versions.startSync();
-    console.log(response);
-    if(response==="permission denied"){
-        alert('Selected File does not have read/write permissions');
+    if(!sourcefile || !destinationfile) {
+      alert('Please select both source and destination files');
+      return;
     }
-    if(sourcefile===destinationfile){
-      alert('Source and Destination file cannot be same');
+    if(sourcefile === destinationfile){
+      alert('Source and destination file cannot be same');
+      return;
+    }
+    setlogs([]); // Clear previous logs
+    let response = await window.versions.startSync();
+    console.log(response);
+    if(response === "permission denied"){
+      alert('Selected File does not have read/write permissions');
     }
   }
 
@@ -41,6 +58,20 @@ const Dragdrop = () => {
       </div>
       <div className='flex justify-center m-auto mt-5 h-[50px] items-center w-50 text-center '>
         <button onClick={startSync} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Start Sync</button>
+      </div>
+      <div className="mt-8 mx-auto max-w-2xl">
+        <h2 className="text-xl font-semibold mb-4">Sync Logs</h2>
+        <div className="border rounded-lg p-4 bg-gray-50 min-h-[100px] max-h-[300px] overflow-y-auto">
+          {logs.length === 0 ? (
+            <p className="text-gray-500 text-center">No logs yet</p>
+          ) : (
+            logs.map((message, i) => (
+              <p key={i} className="py-1 border-b last:border-0">
+                {message}
+              </p>
+            ))
+          )}
+        </div>
       </div>
     </>
 
