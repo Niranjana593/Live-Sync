@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useEffect } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
 import { FileUploader } from "react-drag-drop-files";
 const Dragdrop = () => {
   const [sourcefile, setsourcefile] = useState("");
@@ -26,6 +27,17 @@ const Dragdrop = () => {
     else setdestinationfile('No file selected');
   };
   async function startSync(){
+    toast('Syncing of the file has started.....', {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: false,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+  });
+
     if(!sourcefile || !destinationfile) {
       alert('Please select both source and destination files');
       return;
@@ -44,6 +56,19 @@ const Dragdrop = () => {
 
   return (
     <>
+    <ToastContainer
+      position="top-right"
+      autoClose={5000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick={false}
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme="light"
+
+    />
       <div className='fileupload justify-center   flex w-100vw  gap-10'>
         <div className="flex flex-col justify-center border-2 border-dotted items-center source w-[30%]  h-50 bg-gray-100 rounded-lg font-light">
           <h1>Drag and Drop Your source file here</h1>
@@ -56,8 +81,9 @@ const Dragdrop = () => {
           <h1>Destination file:{destinationfile}</h1>
         </div>
       </div>
-      <div className='flex justify-center m-auto mt-5 h-[50px] items-center w-50 text-center '>
+      <div className='flex flex-col justify-center m-auto mt-10 h-[50px] items-center w-50 text-center '>
         <button onClick={startSync} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Start Sync</button>
+        <button onClick={startSync} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Stop Sync</button>
       </div>
       <div className="mt-8 mx-auto max-w-2xl">
         <h2 className="text-xl font-semibold mb-4">Sync Logs</h2>
@@ -66,9 +92,9 @@ const Dragdrop = () => {
             <p className="text-gray-500 text-center">No logs yet</p>
           ) : (
             logs.map((message, i) => (
-              <p key={i} className="py-1 border-b last:border-0">
+              i%2===0 ?<p key={i} className={`py-1 border-b last:border-0 ${i % 2 === 0 ? 'bg-gray-100' : ''}`}>
                 {message}
-              </p>
+              </p>:null
             ))
           )}
         </div>
