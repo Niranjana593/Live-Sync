@@ -1,7 +1,8 @@
 const { app, BrowserWindow ,ipcMain,dialog,webContents} = require('electron')
 const chokidar=require('chokidar');
 const fs=require('fs');
-const path = require('path')
+const path = require('path');
+const { setInterval } = require('timers/promises');
 let mainWindow;
 let sourcefile="";
 let destinationfile="";
@@ -53,34 +54,47 @@ ipcMain.handle('select-destination', async (event) => {
   destinationfile=filePaths[0];
   return filePaths[0];  // return first selected path
 });
-function Checkpermissions(){
-  //Checks for the permission of the file
-   try{
-    fs.access('sourcefile',fs.constants.R_OK || fs.constants.W_OK)
+// Checks read/write permissions for a given file path
+function checkPermissions(filePath) {
+  if (!filePath) return false;
+  try {
+    fs.accessSync(filePath, fs.constants.R_OK | fs.constants.W_OK);
     return true;
-   }
-   catch{
+  } catch (err) {
     return false;
-   }
-}
-ipcMain.handle('Start-Sync',async (event)=>{
-  let watcher=chokidar.watch(sourcefile,{
-    persistent:true,
-    ignoreInitial:true
-  })
-  if(!Checkpermissions){
-    return 'Permission denied';
   }
-  watcher.on('change',path=>{
-    console.log(`File ${path} has been changed`);
-    
-    // Send initial detection message
-    mainWindow.webContents.send('Sync-Status', `Changes detected in source file: ${path}`);
+}
+
+// Simple date formatter to avoid relying on Intl options that may not be
+// consistent across Electron builds. Produces DD-MM-YYYY HH:MM:SS
+function formatDate(date = new Date()) {
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${pad(date.getDate())}-${pad(date.getMonth() + 1)}-${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
+ipcMain.handle('Start-Sync', async (event) => {
+  if (!checkPermissions(sourcefile)) {
+    return 'permission denied';
+  }
+
+  const watcher = chokidar.watch(sourcefile, {
+    persistent: true,
+    ignoreInitial: true,
+  });
+
+  watcher.on('change', (changedPath) => {
+    console.log(`File ${changedPath} has been changed`);
+
+    // Send initial detection messages
+    const ts = formatDate(new Date());
+    setInterval(() => {
+      mainWindow.webContents.send('Sync-Status', `Changes detected in source file: ${changedPath} at ${ts}`);
+    }, 1000);
     try {
       const stream = fs.createReadStream(sourcefile, 'utf-8');
       const writable = fs.createWriteStream(destinationfile, 'utf-8');
-      
-      stream.on('data', chunk => {
+
+      stream.on('data', (chunk) => {
         console.log('Writing changes to destination file...');
         writable.write(chunk);
       });
@@ -98,8 +112,10 @@ ipcMain.handle('Start-Sync',async (event)=>{
       console.error('Error setting up file sync:', error);
       mainWindow.webContents.send('Sync-Status', `Failed to start sync: ${error.message}`);
     }
-  })
-})
+  });
+
+  return 'watcher started';
+});
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
