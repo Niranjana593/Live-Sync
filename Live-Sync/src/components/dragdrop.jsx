@@ -5,13 +5,14 @@ import { FileUploader } from "react-drag-drop-files";
 const Dragdrop = () => {
   const [sourcefile, setsourcefile] = useState("");
   const [destinationfile, setdestinationfile] = useState("");
+  const [start, setstart] = useState(false);
   const [logs, setlogs] = useState([]);
   useEffect(() => {
     window.versions.onSyncStatus((message) => {
       setlogs((prevLogs) => [...prevLogs, message]);
     });
   }, []);
-
+  
   useEffect(() => {
     console.log(logs);
   }, [logs])
@@ -22,11 +23,16 @@ const Dragdrop = () => {
     else setsourcefile('No file selected');
   };
   async function openvscode(){
-    let respone=await window.versions.openInVSCode(sourcefile);
-    if(sourcefile==="" || destinationfile===""){
-      alert('First slect the source and destination file to open in VS Code')
+    
+    if(!sourcefile || !destinationfile) {
+      alert('Please select both source and destination files');
       return;
     }
+    if(start===false){
+      alert('Please Start the Syncing before opening the file in VS Code')
+      return;
+    }
+    let respone=await window.versions.openInVSCode(sourcefile);
     toast('Attempting to open the file in VS Code')
     if(respone==="Error in Opening the VS Code"){
       toast('Error has occurred in opening the file in VS Code', {
@@ -68,10 +74,13 @@ const Dragdrop = () => {
     }
     setlogs([]); // Clear previous logs
     let response = await window.versions.startSync();
+    
     console.log(response);
     if(response === "permission denied"){
       alert('Selected File does not have read/write permissions');
+      return;
     }
+    setstart(true);
   }
 
   return (
