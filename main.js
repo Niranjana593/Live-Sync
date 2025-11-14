@@ -1,5 +1,6 @@
 const { app, BrowserWindow ,ipcMain,dialog,webContents} = require('electron')
 const chokidar=require('chokidar');
+const {exec} =require('child_process');
 const fs=require('fs');
 const path = require('path');
 const { setInterval } = require('timers/promises');
@@ -40,6 +41,15 @@ ipcMain.handle('select-source', async (event) => {
   sourcefile=filePaths[0];
   return filePaths[0];  // return first selected path
 });
+//Opening the VS code(other program) from my application(Live Sync) we are using child_process module to execute the command for opening the VS Code.
+ipcMain.handle('open-vscode',async(event,filepath)=>{
+  exec(`code "${filepath}"`,(error,stdout,stderr)=>{
+    if(error){
+      console.error(`Error opening VS Code: ${error.message}`);
+      return "Error in Opening the VS Code"
+    }
+  })
+})
 //Destination file selector
 ipcMain.handle('select-destination', async (event) => {
   const { canceled, filePaths } = await dialog.showOpenDialog({

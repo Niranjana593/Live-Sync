@@ -21,6 +21,26 @@ const Dragdrop = () => {
     if (path) setsourcefile(path);
     else setsourcefile('No file selected');
   };
+  async function openvscode(){
+    let respone=await window.versions.openInVSCode(sourcefile);
+    if(sourcefile==="" || destinationfile===""){
+      alert('First slect the source and destination file to open in VS Code')
+      return;
+    }
+    toast('Attempting to open the file in VS Code')
+    if(respone==="Error in Opening the VS Code"){
+      toast('Error has occurred in opening the file in VS Code', {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+    }
+  }
   async function selectDestination() {
     const path = await window.versions.selectDestination();
     if (path) setdestinationfile(path);
@@ -81,9 +101,10 @@ const Dragdrop = () => {
           <h1>Destination file:{destinationfile}</h1>
         </div>
       </div>
-      <div className='flex flex-col justify-center m-auto mt-10 h-[50px] items-center w-50 text-center '>
+      <div className='flex flex-col justify-center m-auto mt-10  items-center w-100 text-center '>
         <button onClick={startSync} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Start Sync</button>
         <button onClick={startSync} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Stop Sync</button>
+        <button onClick={openvscode} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2 ">Open The Source File in VsCode</button>
       </div>
       <div className="mt-8 mx-auto max-w-2xl">
         <h2 className="text-xl font-semibold mb-4">Sync Logs</h2>
