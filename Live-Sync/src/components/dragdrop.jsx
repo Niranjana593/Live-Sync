@@ -28,10 +28,12 @@ const Dragdrop = () => {
       alert('Please select both source and destination files');
       return;
     }
-    if(start===false){
-      alert('Please Start the Syncing before opening the file in VS Code')
+    if(start==false)
+    {
+      alert('Please start the sync before opening the file in VS Code');
       return;
     }
+    console.log('Opening the VS Code');
     let respone=await window.versions.openInVSCode(sourcefile);
     toast('Attempting to open the file in VS Code')
     if(respone==="Error in Opening the VS Code"){
