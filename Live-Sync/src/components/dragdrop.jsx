@@ -5,6 +5,7 @@ import { FileUploader } from "react-drag-drop-files";
 const Dragdrop = () => {
   const [sourcefile, setsourcefile] = useState("");
   const [destinationfile, setdestinationfile] = useState("");
+  const [Syncstarted, setSyncstarted] = useState(false);
   const [logs, setlogs] = useState([]);
   useEffect(() => {
     window.versions.onSyncStatus((message) => {
@@ -26,6 +27,25 @@ const Dragdrop = () => {
     if (path) setdestinationfile(path);
     else setdestinationfile('No file selected');
   };
+  async function OpenVsCode()
+  {
+    if(!sourcefile || !destinationfile) {
+      alert('Please select both source and destination files');
+      return;
+    }
+    if(Syncstarted===false){
+       alert('Please start syncing the file before opening the file in VS Code');
+    }
+    let response=await window.versions.OpenVSCode(sourcefile);
+    toast('Opening the source file in VS Code....');
+    if(response==="Failed to open VS Code"){
+       alert('Filed to open VS Code.Please ensoure VS Code installed in your system and installed that "code" command is available in your PATH.');
+    }
+    else{
+      console.log(response);
+      toast('VS Code opened Successfullty....');
+    }
+  }
   async function startSync(){
     toast('Syncing of the file has started.....', {
     position: "top-right",
@@ -46,6 +66,7 @@ const Dragdrop = () => {
       alert('Source and destination file cannot be same');
       return;
     }
+    setSyncstarted(true);
     setlogs([]); // Clear previous logs
     let response = await window.versions.startSync();
     console.log(response);
@@ -81,9 +102,10 @@ const Dragdrop = () => {
           <h1>Destination file:{destinationfile}</h1>
         </div>
       </div>
-      <div className='flex flex-col justify-center m-auto mt-10 h-[50px] items-center w-50 text-center '>
+      <div className='flex flex-col justify-center m-auto mt-10  items-center text-center '>
         <button onClick={startSync} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Start Sync</button>
         <button onClick={startSync} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Stop Sync</button>
+        <button onClick={OpenVsCode} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Open Source File in VS Code</button>
       </div>
       <div className="mt-8 mx-auto max-w-2xl">
         <h2 className="text-xl font-semibold mb-4">Sync Logs</h2>
@@ -92,7 +114,7 @@ const Dragdrop = () => {
             <p className="text-gray-500 text-center">No logs yet</p>
           ) : (
             logs.map((message, i) => (
-              i%2===0 ?<p key={i} className={`py-1 border-b last:border-0 ${i % 2 === 0 ? 'bg-gray-100' : ''}`}>
+              i%4===0 ?<p key={i} className={`py-1 border-b last:border-0 ${i % 2 === 0 ? 'bg-gray-100' : ''}`}>
                 {message}
               </p>:null
             ))

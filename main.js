@@ -1,5 +1,6 @@
 const { app, BrowserWindow ,ipcMain,dialog,webContents} = require('electron')
 const chokidar=require('chokidar');
+const {exec}=require('child_process');
 const fs=require('fs');
 const path = require('path');
 const { setInterval } = require('timers/promises');
@@ -64,7 +65,19 @@ function checkPermissions(filePath) {
     return false;
   }
 }
-
+ipcMain.handle('Open-Vs-Code',async(event,pathfile)=>{
+  if (!pathfile) return 'Select the Source file';
+  // return a promise so the renderer receives the result when exec completes
+  return new Promise((resolve) => {
+    exec(`code "${pathfile}"`, (error) => {
+      if (error) {
+        resolve(error.message || 'Failed to open VS Code');
+        return;
+      }
+      resolve('VS Code opened successfully');
+    });
+  });
+});
 // Simple date formatter to avoid relying on Intl options that may not be
 // consistent across Electron builds. Produces DD-MM-YYYY HH:MM:SS
 function formatDate(date = new Date()) {
@@ -87,13 +100,11 @@ ipcMain.handle('Start-Sync', async (event) => {
 
     // Send initial detection messages
     const ts = formatDate(new Date());
-    setInterval(() => {
-      mainWindow.webContents.send('Sync-Status', `Changes detected in source file: ${changedPath} at ${ts}`);
-    }, 1000);
+    mainWindow.webContents.send('Sync-Status', `Changes detected in source file at ${ts}`)
     try {
       const stream = fs.createReadStream(sourcefile, 'utf-8');
       const writable = fs.createWriteStream(destinationfile, 'utf-8');
-
+      
       stream.on('data', (chunk) => {
         console.log('Writing changes to destination file...');
         writable.write(chunk);
