@@ -3,13 +3,14 @@ import { useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import { FileUploader } from "react-drag-drop-files";
 const Dragdrop = () => {
-  const [sourcefile, setsourcefile] = useState("");
-  const [destinationfile, setdestinationfile] = useState("");
+  const [sourcefile, setsourcefile] = useState(localStorage.getItem('sourcefile') || "Select Source File");
+  const [destinationfile, setdestinationfile] = useState(localStorage.getItem('destinationfile') || "Select the destination file");
   const [Syncstarted, setSyncstarted] = useState(false);
   const [logs, setlogs] = useState([]);
   useEffect(() => {
     window.versions.onSyncStatus((message) => {
       setlogs((prevLogs) => [...prevLogs, message]);
+      localStorage.setItem('Sync-logs',JSON.stringify([...logs,message]))
     });
   }, []);
 
@@ -19,11 +20,13 @@ const Dragdrop = () => {
   
   async function selectSource() {
     const path = await window.versions.selectSource();
+    localStorage.setItem('sourcefile',path);
     if (path) setsourcefile(path);
     else setsourcefile('No file selected');
   };
   async function selectDestination() {
     const path = await window.versions.selectDestination();
+    localStorage.setItem('destinationfile',path);
     if (path) setdestinationfile(path);
     else setdestinationfile('No file selected');
   };
@@ -46,6 +49,11 @@ const Dragdrop = () => {
       
     }
   }
+  async function stopsync(){
+     setsourcefile('Select Source File');
+     setdestinationfile('Select the destination file')
+      localStorage.clear();
+  }
   async function startSync(){
     toast('Syncing of the file has started.....', {
     position: "top-right",
@@ -62,7 +70,7 @@ const Dragdrop = () => {
       alert('Please select both source and destination files');
       return;
     }
-    if(sourcefile === destinationfile){
+    if(!sourcefile || !destinationfile) {
       alert('Source and destination file cannot be same');
       return;
     }
@@ -104,7 +112,7 @@ const Dragdrop = () => {
       </div>
       <div className='flex flex-col justify-center m-auto mt-10  items-center text-center '>
         <button onClick={startSync} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Start Sync</button>
-        <button onClick={startSync} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Stop Sync</button>
+        <button onClick={stopsync} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Stop Sync</button>
         <button onClick={OpenVsCode} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Open Source File in VS Code</button>
       </div>
       <div className="mt-8 mx-auto max-w-2xl">
@@ -113,7 +121,7 @@ const Dragdrop = () => {
           {logs.length === 0 ? (
             <p className="text-gray-500 text-center">No logs yet</p>
           ) : (
-            logs.map((message, i) => (
+            JSON.parse(localStorage.getItem('Sync-logs')).map((message, i) => (
               i%4===0 ?<p key={i} className={`py-1 border-b last:border-0 ${i % 2 === 0 ? 'bg-gray-100' : ''}`}>
                 {message}
               </p>:null
