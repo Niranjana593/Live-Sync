@@ -43,7 +43,6 @@ const Dragdrop = () => {
     }
     else{
       console.log(response);
-      toast('VS Code opened Successfullty....');
     }
   }
   async function startSync(){
