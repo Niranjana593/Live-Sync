@@ -9,8 +9,8 @@ let sourcefile="";
 let destinationfile="";
 const createWindow = () => {
    mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width:800 ,
+    height: 800,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -100,7 +100,7 @@ ipcMain.handle('Start-Sync', async (event) => {
 
     // Send initial detection messages
     const ts = formatDate(new Date());
-    mainWindow.webContents.send('Sync-Status', `Changes detected in source file at ${ts}`)
+    mainWindow.webContents.send('Sync-Status', `Changes found in source file at ${ts}`);
     try {
       const stream = fs.createReadStream(sourcefile, 'utf-8');
       const writable = fs.createWriteStream(destinationfile, 'utf-8');

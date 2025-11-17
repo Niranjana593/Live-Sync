@@ -6,11 +6,23 @@ const Dragdrop = () => {
   const [sourcefile, setsourcefile] = useState(localStorage.getItem('sourcefile') || "Select Source File");
   const [destinationfile, setdestinationfile] = useState(localStorage.getItem('destinationfile') || "Select the destination file");
   const [Syncstarted, setSyncstarted] = useState(false);
-  const [logs, setlogs] = useState([]);
+  const [logs, setlogs] = useState(()=>{
+    const saved=localStorage.getItem('Sync-logs');
+    if(saved){
+      return JSON.parse(saved);
+    }
+    else{
+      return [];
+    }
+  });
   useEffect(() => {
     window.versions.onSyncStatus((message) => {
-      setlogs((prevLogs) => [...prevLogs, message]);
-      localStorage.setItem('Sync-logs',JSON.stringify([...logs,message]))
+      setlogs((prevLogs) => {
+        const updated=[...prevLogs,message];
+        localStorage.setItem('Sync-message',JSON.stringify(updated));
+        return updated;
+      });
+      
     });
   }, []);
 
@@ -52,7 +64,7 @@ const Dragdrop = () => {
   async function stopsync(){
      setsourcefile('Select Source File');
      setdestinationfile('Select the destination file')
-      localStorage.clear();
+     localStorage.clear();
   }
   async function startSync(){
     toast('Syncing of the file has started.....', {
@@ -98,7 +110,7 @@ const Dragdrop = () => {
       theme="light"
 
     />
-      <div className='fileupload justify-center   flex w-100vw  gap-10'>
+      <div className='fileupload justify-center gap-10 flex w-100vw  gap-10'>
         <div className="flex flex-col justify-center border-2 border-dotted items-center source w-[30%]  h-50 bg-gray-100 rounded-lg font-light">
           <h1>Drag and Drop Your source file here</h1>
           <img className='cursor-pointer' onClick={selectSource} width={50} height={50} src="/file.png" alt="" />
@@ -117,17 +129,18 @@ const Dragdrop = () => {
       </div>
       <div className="mt-8 mx-auto max-w-2xl">
         <h2 className="text-xl font-semibold mb-4">Sync Logs</h2>
-        <div className="border rounded-lg p-4 bg-gray-50 min-h-[100px] max-h-[300px] overflow-y-auto">
+        <div className="border rounded-lg p-4  bg-gray-50 h-[200px]  overflow-y-auto">
           {logs.length === 0 ? (
             <p className="text-gray-500 text-center">No logs yet</p>
           ) : (
-            JSON.parse(localStorage.getItem('Sync-logs')).map((message, i) => (
+            JSON.parse(localStorage.getItem('Sync-message')).map((message, i) => (
               i%4===0 ?<p key={i} className={`py-1 border-b last:border-0 ${i % 2 === 0 ? 'bg-gray-100' : ''}`}>
                 {message}
               </p>:null
             ))
           )}
         </div>
+        
       </div>
     </>
 
