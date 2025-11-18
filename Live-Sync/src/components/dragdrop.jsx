@@ -123,7 +123,7 @@ const Dragdrop = () => {
       theme="light"
 
     />
-      <div className='fileupload justify-center gap-10 flex w-100vw  gap-10'>
+      <div className='fileupload justify-center flex w-100vw  gap-10'>
         <div className="flex flex-col justify-center border-2 border-dotted items-center source w-[30%]  h-50 bg-gray-100 rounded-lg font-light">
           <h1>Drag and Drop Your source file here</h1>
           <img className='cursor-pointer' onClick={selectSource} width={50} height={50} src="/file.png" alt="" />
