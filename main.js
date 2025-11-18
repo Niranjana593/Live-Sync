@@ -11,13 +11,15 @@ const createWindow = () => {
    mainWindow = new BrowserWindow({
     width:800 ,
     height: 800,
+    
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration:false
     }
   })
-
+  // window.menubar=false;
+  mainWindow.menuBarVisible=false;
   mainWindow.loadURL('http://localhost:5173/')
 }
 
@@ -41,6 +43,11 @@ ipcMain.handle('select-source', async (event) => {
   sourcefile=filePaths[0];
   return filePaths[0];  // return first selected path
 });
+//Createing the temporary file
+ipcMain.handle('Create-File',async (event,pathfile)=>{
+    console.log(`Creating Source fileat path: ${pathfile}`);
+    return "File created successfully"
+})
 //Destination file selector
 ipcMain.handle('select-destination', async (event) => {
   const { canceled, filePaths } = await dialog.showOpenDialog({
