@@ -11,7 +11,7 @@ const createWindow = () => {
    mainWindow = new BrowserWindow({
     width:800 ,
     height: 800,
-    
+    icon:path.join(__dirname,'Live-Sync/public/logo.jpeg'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -44,10 +44,33 @@ ipcMain.handle('select-source', async (event) => {
   return filePaths[0];  // return first selected path
 });
 //Createing the temporary file
-ipcMain.handle('Create-File',async (event,pathfile)=>{
-    console.log(`Creating Source fileat path: ${pathfile}`);
-    return "File created successfully"
-})
+ipcMain.handle('Create-File', async (event, pathfile) => {
+  if (!pathfile) {
+    return { ok: false, error: 'No file path provided' };
+  }
+
+  try {
+    // Check if file exists and has write permissions
+    if (fs.existsSync(pathfile)) {
+      if (!checkPermissions(pathfile)) {
+        return { ok: false, error: 'File exists but does not have write permissions' };
+      }
+    } else {
+      // Check if parent directory has write permissions for creating new file
+      const dir = path.dirname(pathfile);
+      if (!checkPermissions(dir)) {
+        return { ok: false, error: 'Directory does not have write permissions' };
+      }
+    }
+
+    console.log(`Creating source file at path: ${pathfile}`);
+    fs.writeFileSync(pathfile, '', { mode: 0o666 });
+    return { ok: true, message: 'File created successfully' };
+  } catch (err) {
+    console.error('Error creating file:', err);
+    return { ok: false, error: err.message };
+  }
+});
 //Destination file selector
 ipcMain.handle('select-destination', async (event) => {
   const { canceled, filePaths } = await dialog.showOpenDialog({
@@ -66,9 +89,11 @@ ipcMain.handle('select-destination', async (event) => {
 function checkPermissions(filePath) {
   if (!filePath) return false;
   try {
-    fs.accessSync(filePath, fs.constants.R_OK | fs.constants.W_OK);
+    // Check for read AND write permissions using bitwise OR (correct for fs.constants)
+    fs.accessSync(filePath, fs.constants.R_OK & fs.constants.W_OK);
     return true;
   } catch (err) {
+    console.error(`Permission check failed for ${filePath}:`, err.message);
     return false;
   }
 }
@@ -92,12 +117,13 @@ function formatDate(date = new Date()) {
   return `${pad(date.getDate())}-${pad(date.getMonth() + 1)}-${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 }
 
-ipcMain.handle('Start-Sync', async (event) => {
-  if (!checkPermissions(sourcefile)) {
+ipcMain.handle('Start-Sync', async (event,pathfile) => {
+  console.log(`Path file is ${pathfile}`)
+  if (!checkPermissions(pathfile)) {
     return 'permission denied';
   }
-
-  const watcher = chokidar.watch(sourcefile, {
+  console.log(`Starting sync for file: ${pathfile}`);
+  const watcher = chokidar.watch(pathfile, {
     persistent: true,
     ignoreInitial: true,
   });
@@ -109,7 +135,7 @@ ipcMain.handle('Start-Sync', async (event) => {
     const ts = formatDate(new Date());
     mainWindow.webContents.send('Sync-Status', `Changes found in source file at ${ts}`);
     try {
-      const stream = fs.createReadStream(sourcefile, 'utf-8');
+      const stream = fs.createReadStream(pathfile, 'utf-8');
       const writable = fs.createWriteStream(destinationfile, 'utf-8');
       
       stream.on('data', (chunk) => {

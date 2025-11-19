@@ -3,9 +3,9 @@ import { useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import { FileUploader } from "react-drag-drop-files";
 const Dragdrop = () => {
-  const [sourcefile, setsourcefile] = useState(localStorage.getItem('sourcefile') || "Select Source File");
+  const [sourcefile, setsourcefile] = useState(localStorage.getItem('sourcefile') || "Create a temporary source file");
   const [destinationfile, setdestinationfile] = useState(localStorage.getItem('destinationfile') || "Select the destination file");
-  const [disable, setdisable] = useState(false)
+  const [disable, setdisable] = useState(true)
   const [Syncstarted, setSyncstarted] = useState(false);
   const file = useRef(null)
   const [logs, setlogs] = useState(()=>{
@@ -36,6 +36,7 @@ const Dragdrop = () => {
   }
   async function getTemporaryFile(){
      setsourcefile(file.current.value);
+     let response=await window.versions.CreateFile(file.current.value);
      localStorage.setItem('sourcefile',file.current.value);
      setdisable(true);
   }
@@ -73,12 +74,10 @@ const Dragdrop = () => {
   async function stopsync(){
      setsourcefile('Select Source File');
      setdestinationfile('Select the destination file')
-     localStorage.clear();
+     localStorage.clear()
   }
   async function createfile(){
      setdisable(false);
-     let response=await window.versions.CreateFile(sourcefile);
-     console.log(response);
   }
   async function startSync(){
     if(sourcefile==="Select Source File" || destinationfile==="Select the destination file") {
@@ -101,7 +100,8 @@ const Dragdrop = () => {
    });
     setSyncstarted(true);
     setlogs([]); // Clear previous logs
-    let response = await window.versions.startSync();
+    console.log(`Created File path ${sourcefile}`)
+    let response = await window.versions.startSync(sourcefile);
     console.log(response);
     if(response === "permission denied"){
       alert('Selected File does not have read/write permissions');
@@ -124,24 +124,19 @@ const Dragdrop = () => {
 
     />
       <div className='fileupload justify-center flex w-100vw  gap-10'>
-        <div className="flex flex-col justify-center border-2 border-dotted items-center source w-[30%]  h-50 bg-gray-100 rounded-lg font-light">
-          <h1>Drag and Drop Your source file here</h1>
-          <img className='cursor-pointer' onClick={selectSource} width={50} height={50} src="/file.png" alt="" />
-          <h1>Source file:{sourcefile}</h1>
-        </div>
-        <div className="flex flex-col justify-center border-2 border-dotted items-center source w-[30%]  h-50 bg-gray-100 rounded-lg font-light">
-          <h1>Drag and Drop Your Destination file here</h1>
-          <img className='cursor-pointer' onClick={selectDestination} width={50} height={50} src="/file.png" alt="" />
-          <h1>Destination file:{destinationfile}</h1>
-        </div>
-        <div className="flex flex-col justify-center border-2 border-dotted items-center source w-[30%]  h-50 bg-gray-100 rounded-lg font-light">
-          <h1>Create Your Temporary Source File</h1>
+        <div className="bg-[#edd687] flex flex-col justify-center border-2 border-dotted items-center source w-[30%]  h-50  rounded-lg font-light">
+          <h1 className='elms-sans text-lg'>Create Your Temporary Source File</h1>
           <img className='cursor-pointer' onClick={createfile} width={50} height={50} src="/creater.png" alt="" />
-          <h1>Source file:{sourcefile}</h1>
+          <h1  className='roboto'>Source file:{sourcefile}</h1>
         </div>
+        <div className="bg-[#edd687] flex flex-col justify-center border-2 border-dotted items-center source w-[30%]  h-50  rounded-lg font-light">
+          <h1 className='elms-sans text-lg'>Drag and Drop Your Destination file here</h1>
+          <img className='cursor-pointer' onClick={selectDestination} width={50} height={50} src="/file.png" alt="" />
+          <h1 className='roboto'>Destination file:{destinationfile}</h1>
+        </div>
+        
       </div>
       <div className='flex flex-col justify-center m-auto mt-10  items-center text-center '>
-        
         <button onClick={startSync} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Start Sync</button>
         <button onClick={stopsync} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Stop Sync</button>
         <button onClick={OpenVsCode} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Open Source File in VS Code</button>
@@ -149,10 +144,10 @@ const Dragdrop = () => {
       <div className={`${disable?"hidden":"block"} w-[40%] h-[23vh] flex flex-col gap-2 m-auto border-2 absolute top-[50%] right-[30%] bg-[#d3e3fd] `}>
          <img width={20} height={100} onClick={handleclick} className='border-none absolute right-3 top-2 cursor-pointer' src="/image.png" alt="cross mark" />
          <div className='m-auto flex w-100 mt-10 gap-2'>
-            <label htmlFor="Create">Enter A File:</label>
+            <label className='elms-sans' htmlFor="Create">Enter A File:</label>
             <input ref={file} type="text" className='border-1 h-6 w-[70%]' defaultValue={`F:\\c language\\`}/>
          </div>
-         <button onClick={getTemporaryFile} className='border-2 w-40 m-auto rounded-2xl h-8 cursor-pointer bg-gray-400 text-center'>Create the File</button>
+         <button onClick={getTemporaryFile} className='roboto border-2 w-40 m-auto rounded-2xl h-8 cursor-pointer bg-gray-400 text-center'>Create a File</button>
       </div>
       <div className="mt-8 mx-auto max-w-2xl mb-3.5">
         <h2 className="text-2xl font-semibold mb-4">Logs Message:</h2>

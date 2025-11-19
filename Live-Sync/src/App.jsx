@@ -8,7 +8,7 @@ function App() {
   return ( 
     <>
       <div className='parent mb-5'>
-        <h1 className='flex text-black justify-center items-center mb-10 text-5xl font-semibold pt-10'>Live File Sync</h1>
+        <h1 className='live flex text-black justify-center items-center mb-10 text-5xl font-semibold pt-10'>Live File Sync</h1>
         <Dragdrop/>
       </div>
       
