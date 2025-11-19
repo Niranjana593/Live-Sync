@@ -38,8 +38,6 @@ ipcMain.handle('select-source', async (event) => {
   if (canceled) {
     return null;  // user canceled, return null
   }
-  console.log(filePaths);
-  console.log(filePaths[0]);
   sourcefile=filePaths[0];
   return filePaths[0];  // return first selected path
 });
@@ -63,7 +61,6 @@ ipcMain.handle('Create-File', async (event, pathfile) => {
       }
     }
 
-    console.log(`Creating source file at path: ${pathfile}`);
     fs.writeFileSync(pathfile, '', { mode: 0o666 });
     return { ok: true, message: 'File created successfully' };
   } catch (err) {
@@ -80,8 +77,6 @@ ipcMain.handle('select-destination', async (event) => {
   if (canceled) {
     return null;  // user canceled, return null
   }
-  console.log(filePaths);
-  console.log(filePaths[0]);
   destinationfile=filePaths[0];
   return filePaths[0];  // return first selected path
 });
@@ -118,18 +113,15 @@ function formatDate(date = new Date()) {
 }
 
 ipcMain.handle('Start-Sync', async (event,pathfile) => {
-  console.log(`Path file is ${pathfile}`)
   if (!checkPermissions(pathfile)) {
     return 'permission denied';
   }
-  console.log(`Starting sync for file: ${pathfile}`);
   const watcher = chokidar.watch(pathfile, {
     persistent: true,
     ignoreInitial: true,
   });
 
   watcher.on('change', (changedPath) => {
-    console.log(`File ${changedPath} has been changed`);
 
     // Send initial detection messages
     const ts = formatDate(new Date());
@@ -139,12 +131,10 @@ ipcMain.handle('Start-Sync', async (event,pathfile) => {
       const writable = fs.createWriteStream(destinationfile, 'utf-8');
       
       stream.on('data', (chunk) => {
-        console.log('Writing changes to destination file...');
         writable.write(chunk);
       });
 
       stream.on('end', () => {
-        console.log('File Sync Completed');
         mainWindow.webContents.send('Sync-Status', 'File synchronization completed successfully');
       });
 

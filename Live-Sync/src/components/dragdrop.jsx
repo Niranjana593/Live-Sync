@@ -29,7 +29,6 @@ const Dragdrop = () => {
   }, []);
 
   useEffect(() => {
-    console.log(logs);
   }, [logs])
   async function handleclick(){
      setdisable(!disable);
@@ -67,7 +66,6 @@ const Dragdrop = () => {
        alert('Filed to open VS Code.Please ensoure VS Code installed in your system and installed that "code" command is available in your PATH.');
     }
     else{
-      console.log(response);
       
     }
   }
@@ -100,9 +98,7 @@ const Dragdrop = () => {
    });
     setSyncstarted(true);
     setlogs([]); // Clear previous logs
-    console.log(`Created File path ${sourcefile}`)
     let response = await window.versions.startSync(sourcefile);
-    console.log(response);
     if(response === "permission denied"){
       alert('Selected File does not have read/write permissions');
     }
