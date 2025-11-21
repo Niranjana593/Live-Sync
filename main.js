@@ -11,7 +11,7 @@ const createWindow = () => {
    mainWindow = new BrowserWindow({
     width:800 ,
     height: 800,
-    icon:path.join(__dirname,'Live-Sync/public/logo.jpeg'),
+    icon:path.join(__dirname,'Live-Sync/public/logo3.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -112,20 +112,29 @@ function formatDate(date = new Date()) {
   return `${pad(date.getDate())}-${pad(date.getMonth() + 1)}-${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 }
 
-ipcMain.handle('Start-Sync', async (event,pathfile) => {
+ipcMain.handle('Start-Sync', async (event, pathfile) => {
   if (!checkPermissions(pathfile)) {
     return 'permission denied';
   }
-  const watcher = chokidar.watch(pathfile, {
+
+  // Close any existing watcher before starting a new one
+  if (fileWatcher) {
+    try {
+      await fileWatcher.close();
+    } catch (e) {
+      console.warn('Error closing previous watcher:', e);
+    }
+  }
+
+  fileWatcher = chokidar.watch(pathfile, {
     persistent: true,
     ignoreInitial: true,
   });
 
-  watcher.on('change', (changedPath) => {
-
+  fileWatcher.on('change', (changedPath) => {
     // Send initial detection messages
     const ts = formatDate(new Date());
-    mainWindow.webContents.send('Sync-Status', `Changes found in source file at ${ts}`);
+    mainWindow.webContents.send('Sync-Status', `Changes detected in the source file at ${ts}`);
     try {
       const stream = fs.createReadStream(pathfile, 'utf-8');
       const writable = fs.createWriteStream(destinationfile, 'utf-8');
@@ -149,7 +158,48 @@ ipcMain.handle('Start-Sync', async (event,pathfile) => {
   });
 
   return 'watcher started';
+});;
+
+// Store watcher reference so we can close it
+let fileWatcher = null;
+
+ipcMain.handle('Stop-Watcher', async (event) => {
+  if (fileWatcher) {
+    try {
+      await fileWatcher.close();
+      fileWatcher = null;
+      console.log('File watcher stopped');
+      return { ok: true, message: 'Watcher stopped' };
+    } catch (err) {
+      console.error('Error closing watcher:', err);
+      return { ok: false, error: err.message };
+    }
+  }
+  return { ok: true, message: 'No active watcher' };
 });
+
+ipcMain.handle('Stop-Sync', async (event, pathfile) => {
+  try {
+    // Stop the watcher first
+    if (fileWatcher) {
+      await fileWatcher.close();
+      fileWatcher = null;
+      console.log('Watcher closed');
+    }
+
+    // Delete the file
+    if (pathfile && fs.existsSync(pathfile)) {
+      fs.unlinkSync(pathfile);
+      console.log(`File deleted: ${pathfile}`);
+    }
+
+    return { ok: true, message: 'Successfully stopped sync and deleted the temporary file' };
+  } catch (err) {
+    console.error('Error stopping sync:', err);
+    return { ok: false, error: err.message };
+  }
+});
+
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()

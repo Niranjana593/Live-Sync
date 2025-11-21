@@ -27,24 +27,17 @@ const Dragdrop = () => {
       
     });
   }, []);
-
-  useEffect(() => {
-  }, [logs])
   async function handleclick(){
+     
      setdisable(!disable);
   }
   async function getTemporaryFile(){
      setsourcefile(file.current.value);
      let response=await window.versions.CreateFile(file.current.value);
+     toast("Temporary file created successfully");
      localStorage.setItem('sourcefile',file.current.value);
      setdisable(true);
   }
-  async function selectSource() {
-    const path = await window.versions.selectSource();
-    localStorage.setItem('sourcefile',path);
-    if (path) setsourcefile(path);
-    else setsourcefile('No file selected');
-  };
   async function selectDestination() {
     const path = await window.versions.selectDestination();
     localStorage.setItem('destinationfile',path);
@@ -70,9 +63,48 @@ const Dragdrop = () => {
     }
   }
   async function stopsync(){
-     setsourcefile('Select Source File');
-     setdestinationfile('Select the destination file')
-     localStorage.clear()
+    console.log(sourcefile);
+    try {
+      const respone=await window.versions.StopWatcher();
+      const res = await window.versions.StopSync(sourcefile);
+      
+      if (res && res.ok) {
+        toast(res.message || 'Sync stopped and file deleted', {
+          position: 'top-right',
+          autoClose: 3000,
+          type: 'success',
+        });
+      } else {
+        toast(`Error: ${res?.error || 'Failed to stop sync'}`, {
+          position: 'top-right',
+          autoClose: 5000,
+          type: 'error',
+        });
+      }
+    } catch (err) {
+      console.error('stopsync error:', err);
+      toast('Error stopping sync', {
+        position: 'top-right',
+        autoClose: 5000,
+        type: 'error',
+      });
+    }
+
+    // Reset state regardless of success/failure
+    setSyncstarted(false);
+    setsourcefile('Create a temporary source file');
+    setdestinationfile('Select the destination file');
+    setlogs([]); // Clear logs in state first
+    
+    // Clear localStorage after state updates
+    try {
+      localStorage.removeItem('sourcefile');
+      localStorage.removeItem('destinationfile');
+      localStorage.removeItem('Sync-logs');
+      localStorage.removeItem('Sync-message');
+    } catch (err) {
+      console.error('Error clearing localStorage:', err);
+    }
   }
   async function createfile(){
      setdisable(false);
@@ -123,12 +155,12 @@ const Dragdrop = () => {
         <div className="bg-[#edd687] flex flex-col justify-center border-2 border-dotted items-center source w-[30%]  h-50  rounded-lg font-light">
           <h1 className='elms-sans text-lg'>Create Your Temporary Source File</h1>
           <img className='cursor-pointer' onClick={createfile} width={50} height={50} src="/creater.png" alt="" />
-          <h1  className='roboto'>Source file:{sourcefile}</h1>
+          <h1  className='roboto'>Source File:{sourcefile}</h1>
         </div>
         <div className="bg-[#edd687] flex flex-col justify-center border-2 border-dotted items-center source w-[30%]  h-50  rounded-lg font-light">
-          <h1 className='elms-sans text-lg'>Drag and Drop Your Destination file here</h1>
+          <h1 className='elms-sans text-lg'>Select Your Destination File</h1>
           <img className='cursor-pointer' onClick={selectDestination} width={50} height={50} src="/file.png" alt="" />
-          <h1 className='roboto'>Destination file:{destinationfile}</h1>
+          <h1 className='roboto'>Destination File:{destinationfile}</h1>
         </div>
         
       </div>
@@ -137,8 +169,9 @@ const Dragdrop = () => {
         <button onClick={stopsync} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Stop Sync</button>
         <button onClick={OpenVsCode} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Open Source File in VS Code</button>
       </div>
-      <div className={`${disable?"hidden":"block"} w-[40%] h-[23vh] flex flex-col gap-2 m-auto border-2 absolute top-[50%] right-[30%] bg-[#d3e3fd] `}>
+      <div className={`${disable?"hidden":"block"} w-[40%] h-[28vh] flex flex-col gap-2 m-auto border-2 absolute top-[15%] right-[30%] bg-[#d3e3fd] `}>
          <img width={20} height={100} onClick={handleclick} className='border-none absolute right-3 top-2 cursor-pointer' src="/image.png" alt="cross mark" />
+         <h3 className='flex justify-center elms-sans '>Create a Temporary File</h3>
          <div className='m-auto flex w-100 mt-10 gap-2'>
             <label className='elms-sans' htmlFor="Create">Enter A File:</label>
             <input ref={file} type="text" className='border-1 h-6 w-[70%]' defaultValue={`F:\\c language\\`}/>
@@ -146,7 +179,7 @@ const Dragdrop = () => {
          <button onClick={getTemporaryFile} className='roboto border-2 w-40 m-auto rounded-2xl h-8 cursor-pointer bg-gray-400 text-center'>Create a File</button>
       </div>
       <div className="mt-8 mx-auto max-w-2xl mb-3.5">
-        <h2 className="text-2xl font-semibold mb-4">Logs Message:</h2>
+        <h2 className="text-2xl font-semibold mb-4">Logs Messages:</h2>
         <div className="border rounded-lg p-4  bg-gray-50 h-[200px]  overflow-y-auto">
           {logs.length === 0 ? (
             <p className="text-gray-500 text-center">No logs yet</p>
