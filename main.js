@@ -20,7 +20,13 @@ const createWindow = () => {
   })
   // window.menubar=false;
   mainWindow.menuBarVisible=false;
-  mainWindow.loadURL('http://localhost:5173/')
+  // Load the built dist folder using file:// protocol with proper path
+  const distPath = path.join(__dirname, 'Live-Sync/dist/index.html');
+  mainWindow.loadFile(distPath);
+  // For development, use: mainWindow.loadURL('http://localhost:5173/')
+  
+  // Open DevTools for debugging (comment out for production)
+  // mainWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {

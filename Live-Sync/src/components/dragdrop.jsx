@@ -1,5 +1,9 @@
 import React, { useState,useRef } from 'react'
 import { useEffect } from 'react';
+// Import images as assets so Vite bundles them with correct paths
+const createrImg = new URL('../../public/creater.png', import.meta.url).href;
+const fileImg = new URL('../../public/file.png', import.meta.url).href;
+const crossImg = new URL('../../public/image.png', import.meta.url).href;
 import { ToastContainer, toast } from 'react-toastify';
 import { FileUploader } from "react-drag-drop-files";
 const Dragdrop = () => {
@@ -154,12 +158,12 @@ const Dragdrop = () => {
       <div className='fileupload justify-center flex w-100vw  gap-10'>
         <div className="bg-[#edd687] flex flex-col justify-center border-2 border-dotted items-center source w-[30%]  h-50  rounded-lg font-light">
           <h1 className='elms-sans text-lg'>Create Your Temporary Source File</h1>
-          <img className='cursor-pointer' onClick={createfile} width={50} height={50} src="/creater.png" alt="" />
+          <img className='cursor-pointer' onClick={createfile} width={50} height={50} src={createrImg} alt="" />
           <h1  className='roboto'>Source File:{sourcefile}</h1>
         </div>
         <div className="bg-[#edd687] flex flex-col justify-center border-2 border-dotted items-center source w-[30%]  h-50  rounded-lg font-light">
           <h1 className='elms-sans text-lg'>Select Your Destination File</h1>
-          <img className='cursor-pointer' onClick={selectDestination} width={50} height={50} src="/file.png" alt="" />
+          <img className='cursor-pointer' onClick={selectDestination} width={50} height={50} src={fileImg} alt="" />
           <h1 className='roboto'>Destination File:{destinationfile}</h1>
         </div>
         
@@ -170,7 +174,7 @@ const Dragdrop = () => {
         <button onClick={OpenVsCode} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Open Source File in VS Code</button>
       </div>
       <div className={`${disable?"hidden":"block"} w-[40%] h-[28vh] flex flex-col gap-2 m-auto border-2 absolute top-[15%] right-[30%] bg-[#d3e3fd] `}>
-         <img width={20} height={100} onClick={handleclick} className='border-none absolute right-3 top-2 cursor-pointer' src="/image.png" alt="cross mark" />
+         <img width={20} height={100} onClick={handleclick} className='border-none absolute right-3 top-2 cursor-pointer' src={crossImg} alt="cross mark" />
          <h3 className='flex justify-center elms-sans '>Create a Temporary File</h3>
          <div className='m-auto flex w-100 mt-10 gap-2'>
             <label className='elms-sans' htmlFor="Create">Enter A File:</label>
