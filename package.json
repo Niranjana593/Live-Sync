@@ -3,9 +3,47 @@
   "version": "1.0.0",
   "description": "This a desktop application where the changes made on the source file will be reflecting on the dstination file in a real time",
   "main": "main.js",
+  "build": {
+    "appId": "com.niranjan.livesync",
+    "productName": "Live Sync",
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "icon": "asset/icons/win/logo3.ico"
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "icon": "asset/icons/mac/logo3.icns"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "icon": "asset/icons/linux/logo3.png"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Niranjana593",
+        "repo": "Live-Sync"
+      }
+    ],
+    "directories": {
+      "output": "Packages"
+    }
+  },
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux",
+    "publish": "electron-builder --publish always"
   },
   "repository": {
     "type": "git",
@@ -18,13 +56,15 @@
   },
   "homepage": "https://github.com/Niranjana593/Live-Sync#readme",
   "devDependencies": {
-    "electron": "^38.2.2"
+    "electron": "^38.2.2",
+    "electron-builder": "^26.0.12"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",
     "chokidar": "^4.0.3",
     "fs": "^0.0.1-security",
     "react-toastify": "^11.0.5",
-    "tailwindcss": "^4.1.14"
+    "tailwindcss": "^4.1.14",
+    "update-electron-app": "^3.1.1"
   }
 }

@@ -1,4 +1,4 @@
-const { app, BrowserWindow ,ipcMain,dialog,webContents} = require('electron')
+const { app, BrowserWindow ,ipcMain,dialog,webContents, autoUpdater} = require('electron')
 const chokidar=require('chokidar');
 const {exec}=require('child_process');
 const fs=require('fs');
@@ -33,6 +33,14 @@ app.whenReady().then(() => {
   createWindow()// this for the window/linux os. 
   app.on('activate', () => {// This is for mac os.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  })
+  autoUpdater.checkForUpdatesAndNotify();
+  autoUpdater.on('update-available',()=>{
+      console.log("Update available...")
+  })
+  autoUpdater.on('update-downloaded',()=>{
+      console.log("Update downloaded. It will be installed on restart");
+      autoUpdater.quitAndInstall();
   })
 })
 //Source file selector
