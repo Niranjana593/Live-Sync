@@ -1,5 +1,8 @@
 import React, { useState,useRef } from 'react'
 import { useEffect } from 'react';
+import Swal from 'sweetalert2'
+import 'sweetalert2/themes/bulma.css'
+import 'sweetalert2/themes/bootstrap-4.css'
 // Import images as assets so Vite bundles them with correct paths
 const createrImg = new URL('../../public/creater.png', import.meta.url).href;
 const fileImg = new URL('../../public/file.png', import.meta.url).href;
@@ -36,6 +39,18 @@ const Dragdrop = () => {
      setdisable(!disable);
   }
   async function getTemporaryFile(){
+    if(!file.current.value.includes('.'))
+    {
+      // alert('Please provide a valid file name with extension');
+      Swal.fire({
+        title: 'Warning!',
+        text: 'Please provide a valid file name with extension',
+        icon: 'warning',
+        confirmButtonText: 'OK!',
+        theme:'bulma'
+      })
+      return;
+    }
      setsourcefile(file.current.value);
      let response=await window.versions.CreateFile(file.current.value);
      toast("Temporary file created successfully");
@@ -51,11 +66,26 @@ const Dragdrop = () => {
   async function OpenVsCode()
   {
     if(!sourcefile || !destinationfile) {
-      alert('Please select both source and destination files');
+      // alert('Please select both source and destination files');
+      Swal.fire({
+        title: 'Warning!',
+        text: 'Please select both source and destination files',
+        icon: 'warning',
+        confirmButtonText: 'OK!',
+        theme:'bootstrap-4'
+      })
       return;
     }
     if(Syncstarted===false){
-       alert('Please start syncing the file before opening the file in VS Code');
+      //  alert('Please start syncing the file before opening the file in VS Code');
+      Swal.fire({
+        title: 'Warning!',
+        text: 'Please start syncing the files before opening the file in VS Code',
+        icon: 'warning',
+        confirmButtonText: 'OK!',
+        theme:'bulma'
+      })
+      return;
     }
     let response=await window.versions.OpenVSCode(sourcefile);
     toast('Opening the source file in VS Code....');
@@ -115,7 +145,14 @@ const Dragdrop = () => {
   }
   async function startSync(){
     if(sourcefile==="Select Source File" || destinationfile==="Select the destination file") {
-      alert('Please select both source and destination files');
+      // alert('Please select both source and destination files');
+      Swal.fire({
+        title: 'Warning!',
+        text: 'Please select both source and destination files',
+        icon: 'warning',
+        confirmButtonText: 'OK!',
+        theme:'bulma'
+      })
       return;
     }
     if(sourcefile===destinationfile) {
@@ -173,14 +210,14 @@ const Dragdrop = () => {
         <button onClick={stopsync} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Stop Sync</button>
         <button onClick={OpenVsCode} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Open Source File in VS Code</button>
       </div>
-      <div className={`${disable?"hidden":"block"} w-[40%] h-[28vh] flex flex-col gap-2 m-auto border-2 absolute top-[15%] right-[30%] bg-[#d3e3fd] `}>
+      <div className={`${disable?"hidden":"block"} w-[40%]  flex flex-col gap-2 m-auto border-2 absolute  top-[15%] right-[30%] bg-[#F5F5F5] shadow-[3px_4px_17px_1px_rgba(0,0,0,0.3)] pt-13px m-33px text-[21px]`}>
          <img width={20} height={100} onClick={handleclick} className='border-none absolute right-3 top-2 cursor-pointer' src={crossImg} alt="cross mark" />
-         <h3 className='flex justify-center elms-sans '>Create a Temporary File</h3>
-         <div className='m-auto flex w-100 mt-10 gap-2'>
-            <label className='elms-sans' htmlFor="Create">Enter A File:</label>
-            <input ref={file} type="text" className='border-1 h-6 w-[70%]' defaultValue={`F:\\c language\\`}/>
+         <h3 className='flex justify-center font-medium mt-[44px] Inter'>Create a Temporary File</h3>
+         <div className='flex gap-[10px] pl-[74px] pt-[14px] '>
+            <label className='Inter cursor-pointer' htmlFor="Create">Enter A File:</label>
+            <input ref={file} type="text" id='Create' className='border-1 text-sm font-medium h-6 Inter' defaultValue={`F:\\c language\\`}/>
          </div>
-         <button onClick={getTemporaryFile} className='roboto border-2 w-40 m-auto rounded-2xl h-8 cursor-pointer bg-gray-400 text-center'>Create a File</button>
+         <button onClick={getTemporaryFile} className='mb-[20px] text-white roboto border-2 border-black w-40 m-auto text-lg rounded-lg h-8 cursor-pointer bg-black text-center'>Create a File</button>
       </div>
       <div className="mt-8 mx-auto max-w-2xl mb-3.5">
         <h2 className="text-2xl font-semibold mb-4">Logs Messages:</h2>

@@ -34,6 +34,7 @@ app.whenReady().then(() => {
   app.on('activate', () => {// This is for mac os.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+  // autoUpdater.checkForUpdatesAndNotify();
   autoUpdater.checkForUpdatesAndNotify();
   autoUpdater.on('update-available',()=>{
       console.log("Update available...")
