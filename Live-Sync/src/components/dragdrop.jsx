@@ -190,52 +190,67 @@ const Dragdrop = () => {
       draggable
       pauseOnHover
       theme="light"
-
     />
-      <div className='fileupload justify-center flex w-100vw  gap-10'>
-        <div className="bg-[#edd687] flex flex-col justify-center border-2 border-dotted items-center source w-[30%]  h-50  rounded-lg font-light">
-          <h1 className='elms-sans text-lg'>Create Your Temporary Source File</h1>
-          <img className='cursor-pointer' onClick={createfile} width={50} height={50} src={createrImg} alt="" />
-          <h1  className='roboto'>Source File:{sourcefile}</h1>
+    
+    {/* Main container with responsive padding */}
+    <div className="min-h-screen bg-white p-4 sm:p-6 lg:p-8">
+      
+      {/* File selection cards - responsive grid */}
+      <div className='flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 lg:gap-10 mb-8'>
+        {/* Source file card */}
+        <div className="bg-[#edd687] flex flex-col justify-center border-2 border-dotted items-center w-full sm:w-[45%] lg:w-[30%] h-40 sm:h-48 rounded-lg font-light shadow-md hover:shadow-lg transition-shadow">
+          <h1 className='elms-sans text-base sm:text-lg lg:text-xl text-center px-2'>Create Your Temporary Source File</h1>
+          <img className='cursor-pointer my-2' onClick={createfile} width={40} height={40} src={createrImg} alt="Create file" />
+          <h1 className='roboto text-xs sm:text-sm lg:text-base text-center px-2 truncate w-full'>Source: {sourcefile}</h1>
         </div>
-        <div className="bg-[#edd687] flex flex-col justify-center border-2 border-dotted items-center source w-[30%]  h-50  rounded-lg font-light">
-          <h1 className='elms-sans text-lg'>Select Your Destination File</h1>
-          <img className='cursor-pointer' onClick={selectDestination} width={50} height={50} src={fileImg} alt="" />
-          <h1 className='roboto'>Destination File:{destinationfile}</h1>
+
+        {/* Destination file card */}
+        <div className="bg-[#edd687] flex flex-col justify-center border-2 border-dotted items-center w-full sm:w-[45%] lg:w-[30%] h-40 sm:h-48 rounded-lg font-light shadow-md hover:shadow-lg transition-shadow">
+          <h1 className='elms-sans text-base sm:text-lg lg:text-xl text-center px-2'>Select Your Destination File</h1>
+          <img className='cursor-pointer my-2' onClick={selectDestination} width={40} height={40} src={fileImg} alt="Select file" />
+          <h1 className='roboto text-xs sm:text-sm lg:text-base text-center px-2 truncate w-full'>Destination: {destinationfile}</h1>
+        </div>
+      </div>
+
+      {/* Button group - responsive stacking */}
+      <div className='flex flex-col sm:flex-row gap-3 sm:gap-2 justify-center items-center mb-8 flex-wrap'>
+        <button onClick={startSync} type="button" className="w-full sm:w-auto text-white text-xs sm:text-sm bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 font-medium rounded-lg px-6 sm:px-8 py-2.5">Start Sync</button>
+        <button onClick={stopsync} type="button" className="w-full sm:w-auto text-white text-xs sm:text-sm bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 font-medium rounded-lg px-6 sm:px-8 py-2.5">Stop Sync</button>
+        <button onClick={OpenVsCode} type="button" className="w-full sm:w-auto text-white text-xs sm:text-sm bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 font-medium rounded-lg px-6 sm:px-8 py-2.5">Open in VS Code</button>
+      </div>
+
+      {/* Create file modal - responsive positioning and sizing */}
+      <div className={`${disable?"hidden":"block"} fixed sm:absolute inset-4 sm:inset-auto sm:top-[15%] sm:right-[5%] md:right-[20%] lg:right-[30%] w-auto sm:w-[90%] md:w-[60%] lg:w-[40%] max-w-sm bg-[#F5F5F5] border-2 border-gray-300 rounded-lg shadow-xl p-6 sm:p-8 z-50`}>
+        <img width={20} height={20} onClick={handleclick} className='absolute right-3 top-3 cursor-pointer hover:scale-110 transition-transform' src={crossImg} alt="close" />
+        <h3 className='text-center font-medium text-base sm:text-lg mt-6 mb-4'>Create a Temporary File</h3>
+        
+        <div className='flex flex-col sm:flex-row gap-2 sm:gap-3 items-start sm:items-center mb-4'>
+          <label className='cursor-pointer text-sm sm:text-base whitespace-nowrap' htmlFor="Create">Enter File Path:</label>
+          <input ref={file} type="text" id='Create' className='border border-gray-300 text-xs sm:text-sm font-medium h-8 sm:h-10 px-2 rounded w-full' defaultValue={process.cwd()}/>
         </div>
         
+        <button onClick={getTemporaryFile} className='w-full sm:w-40 text-white text-sm sm:text-base font-medium rounded-lg h-9 sm:h-10 cursor-pointer bg-black hover:bg-gray-800 transition-colors'>Create File</button>
       </div>
-      <div className='flex flex-col justify-center m-auto mt-10  items-center text-center '>
-        <button onClick={startSync} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Start Sync</button>
-        <button onClick={stopsync} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Stop Sync</button>
-        <button onClick={OpenVsCode} type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 cursor-pointer hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-8 py-2.5 text-center me-2 mb-2">Open Source File in VS Code</button>
-      </div>
-      <div className={`${disable?"hidden":"block"} w-[40%]  flex flex-col gap-2 m-auto border-2 absolute  top-[15%] right-[30%] bg-[#F5F5F5] shadow-[3px_4px_17px_1px_rgba(0,0,0,0.3)] pt-13px m-33px text-[21px]`}>
-         <img width={20} height={100} onClick={handleclick} className='border-none absolute right-3 top-2 cursor-pointer' src={crossImg} alt="cross mark" />
-         <h3 className='flex justify-center font-medium mt-[44px] Inter'>Create a Temporary File</h3>
-         <div className='flex gap-[10px] pl-[74px] pt-[14px] '>
-            <label className='Inter cursor-pointer' htmlFor="Create">Enter A File:</label>
-            <input ref={file} type="text" id='Create' className='border-1 text-sm font-medium h-6 Inter' defaultValue={process.cwd()}/>
-         </div>
-         <button onClick={getTemporaryFile} className='mb-[20px] text-white roboto border-2 border-black w-40 m-auto text-lg rounded-lg h-8 cursor-pointer bg-black text-center'>Create a File</button>
-      </div>
-      <div className="mt-8 mx-auto max-w-2xl mb-3.5">
-        <h2 className="text-2xl font-semibold mb-4">Logs Messages:</h2>
-        <div className="border rounded-lg p-4  bg-gray-50 h-[200px]  overflow-y-auto">
+
+      {/* Logs section - responsive layout */}
+      <div className="mt-8 sm:mt-12 mx-auto w-full sm:max-w-3xl lg:max-w-4xl px-2 sm:px-0 mb-3.5">
+        <h2 className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 px-2 sm:px-0">Sync Logs:</h2>
+        <div className="border border-gray-300 rounded-lg p-3 sm:p-4 bg-gray-50 min-h-[150px] sm:min-h-[200px] max-h-[300px] sm:max-h-[400px] overflow-y-auto shadow-sm">
           {logs.length === 0 ? (
-            <p className="text-gray-500 text-center">No logs yet</p>
+            <p className="text-gray-400 text-center text-sm">No logs yet</p>
           ) : (
-            JSON.parse(localStorage.getItem('Sync-message')).map((message, i) => (
-              i%4===0 ?<p key={i} className={`py-1 border-b last:border-0 ${i % 2 === 0 ? 'bg-gray-100' : ''}`}>
-                {message}
-              </p>:null
+            logs.map((message, i) => (
+              i%4===0 && (
+                <p key={i} className={`py-2 sm:py-2.5 px-2 sm:px-3 border-b text-xs sm:text-sm last:border-0 ${i % 2 === 0 ? 'bg-gray-100' : ''}`}>
+                  {message}
+                </p>
+              )
             ))
           )}
         </div>
-        
       </div>
+    </div>
     </>
-
   )
 }
 
