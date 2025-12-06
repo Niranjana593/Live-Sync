@@ -22,4 +22,4 @@ ___
 For Linux os download this:[For Window](https://github.com/Niranjana593/Live-Sync/releases/tag/v1.0.2); 
 ___
 
-# Usage Guide 
+# Usage Guide  
