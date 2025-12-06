@@ -23,3 +23,5 @@ For Linux os download this:[For Window](https://github.com/Niranjana593/Live-Syn
 ___
 
 # Usage Guide  
+![Full Screen](https://github.com/Niranjana593/Live-Sync/blob/main/Full_image.jpg?raw=true)
+![fle selection section](https://github.com/Niranjana593/Live-Sync/blob/main/source.jpg?raw=true)
