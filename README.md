@@ -34,6 +34,6 @@ ___
 * Node JS
 
 # Author
-** NIRANJAN B M**
-GitHub Link [](https://github.com/Niranjana593/)
+**NIRANJAN B M**
+GitHub Link [github link](https://github.com/Niranjana593/)
 
