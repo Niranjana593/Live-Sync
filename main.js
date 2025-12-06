@@ -56,6 +56,9 @@ ipcMain.handle('select-source', async (event) => {
   sourcefile=filePaths[0];
   return filePaths[0];  // return first selected path
 });
+ipcMain.handle('Get-Cwd',async(event)=>{
+   return process.cwd();
+})
 //Createing the temporary file
 ipcMain.handle('Create-File', async (event, pathfile) => {
   if (!pathfile) {

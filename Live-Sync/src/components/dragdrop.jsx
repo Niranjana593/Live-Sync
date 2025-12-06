@@ -176,6 +176,13 @@ const Dragdrop = () => {
       alert('Selected File does not have read/write permissions');
     }
   }
+  const [cwd, setcwd] = useState("")
+  useEffect(async() => {
+      const cwd=await window.versions.getCwd();
+      console.log(cwd);
+      setcwd(cwd+"\\");
+  }, [])
+  
 
   return (
     <>
@@ -226,7 +233,7 @@ const Dragdrop = () => {
         
         <div className='flex flex-col sm:flex-row gap-2 sm:gap-3 items-start sm:items-center mb-4'>
           <label className='cursor-pointer text-sm sm:text-base whitespace-nowrap' htmlFor="Create">Enter File Path:</label>
-          <input ref={file} type="text" id='Create' className='border border-gray-300 text-xs sm:text-sm font-medium h-8 sm:h-10 px-2 rounded w-full' defaultValue={process.cwd()}/>
+          <input ref={file} type="text" id='Create' className='border border-gray-300 text-xs sm:text-sm font-medium h-8 sm:h-10 px-2 rounded w-full' defaultValue={`${cwd}`}/>
         </div>
         
         <button onClick={getTemporaryFile} className='w-full sm:w-40 text-white text-sm sm:text-base font-medium rounded-lg h-9 sm:h-10 cursor-pointer bg-black hover:bg-gray-800 transition-colors'>Create File</button>
