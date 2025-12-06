@@ -215,7 +215,7 @@ const Dragdrop = () => {
          <h3 className='flex justify-center font-medium mt-[44px] Inter'>Create a Temporary File</h3>
          <div className='flex gap-[10px] pl-[74px] pt-[14px] '>
             <label className='Inter cursor-pointer' htmlFor="Create">Enter A File:</label>
-            <input ref={file} type="text" id='Create' className='border-1 text-sm font-medium h-6 Inter' defaultValue={`F:\\c language\\`}/>
+            <input ref={file} type="text" id='Create' className='border-1 text-sm font-medium h-6 Inter' defaultValue={process.cwd()}/>
          </div>
          <button onClick={getTemporaryFile} className='mb-[20px] text-white roboto border-2 border-black w-40 m-auto text-lg rounded-lg h-8 cursor-pointer bg-black text-center'>Create a File</button>
       </div>
