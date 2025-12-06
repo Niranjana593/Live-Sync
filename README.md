@@ -24,4 +24,16 @@ ___
 
 # Usage Guide  
 ![Full Screen](https://github.com/Niranjana593/Live-Sync/blob/main/Full_image.jpg?raw=true)
+---
 ![fle selection section](https://github.com/Niranjana593/Live-Sync/blob/main/source.jpg?raw=true)
+
+# Technology Used
+* Electron JS
+* React JS
+* File System management packages(Choikidar,fs)
+* Node JS
+
+# Author
+** NIRANJAN B M**
+GitHub Link [](https://github.com/Niranjana593/)
+
