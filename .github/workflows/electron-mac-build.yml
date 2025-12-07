@@ -29,5 +29,3 @@ jobs:
         with:
           name: macos-build
           path: dist/mac/*
-      - name: List dist folder
-        run: ls -R dist
