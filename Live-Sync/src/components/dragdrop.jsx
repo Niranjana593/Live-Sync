@@ -159,7 +159,7 @@ const Dragdrop = () => {
       alert('Source and destination file cannot be same');
       return;
     }
-    toast('Syncing of the file has started.....', {
+    toast('Syncing of files has started.....', {
     position: "top-right",
     autoClose: 5000,
     hideProgressBar: false,
